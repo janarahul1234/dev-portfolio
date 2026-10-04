@@ -1,26 +1,171 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   RAHUL JANA - design tokens
+   One dark theme lock (#0A0A0A), one accent lock (acid green),
+   sharp corners everywhere (radius 0) except the cursor dot.
+--------------------------------------------------------------------------- */
+
+@theme {
+  --color-ink: #0a0a0a;
+  --color-surface: #121210;
+  --color-elevated: #1a1a17;
+  --color-line: #2c2c27;
+  --color-paper: #f2f0ea;
+  --color-muted: #96948c;
+  --color-faint: #6b6963;
+  --color-acid: #b8e61e;
+  --color-acid-dim: #8fb019;
+
+  --font-display: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains);
+  --font-sans: var(--font-space-grotesk);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ---- keyframes (CSS-only, all gated behind no-preference) ---- */
+
+@keyframes typing-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  40% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+html {
+  background: var(--color-ink);
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-acid);
+  color: var(--color-ink);
+}
+
+/* ---- custom cursor: hide native pointer only on fine pointers,
+   text inputs keep a caret cursor for usability ---- */
+
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  input,
+  textarea,
+  select {
+    cursor: auto;
+  }
+}
+
+/* ---- visible keyboard focus, one system-wide ring ---- */
+
+:focus-visible {
+  outline: 2px solid var(--color-acid);
+  outline-offset: 3px;
+}
+
+/* ---- anchor offset for the fixed nav ---- */
+
+section[id],
+main[id] {
+  scroll-margin-top: 88px;
+}
+
+/* ---- skip link ---- */
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 80;
+  background: var(--color-acid);
+  color: var(--color-ink);
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem;
+  clip-path: inset(50%);
+}
+
+.skip-link:focus {
+  clip-path: none;
+}
+
+/* ---- route transition: short black wipe (Next 16 / React 19.2
+   View Transitions, root level). Reduced motion: instant swap. ---- */
+
+::view-transition-old(root) {
+  animation: 180ms ease-in both fade-to-black;
+}
+::view-transition-new(root) {
+  animation: 300ms ease-out 140ms both reveal-from-black;
+}
+
+@keyframes fade-to-black {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes reveal-from-black {
+  from {
+    opacity: 0;
+    filter: brightness(0.2);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ---- reduced-motion blanket for CSS animation utilities ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe-anim {
+    animation: none !important;
+  }
 }
